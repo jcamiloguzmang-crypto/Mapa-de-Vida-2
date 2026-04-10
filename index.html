@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Vida Tántrico</title>
+    <title>Mapa de Vida</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --primary: #6200ee; }
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .result-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #f9f9f9; }
-        .detail-row { margin: 5px 0; }
-        #results { display: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 800px; margin: auto; color: #333; }
+        .card { border: 1px solid #eee; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 20px; }
+        .result-card { background: #f0f4ff; border-left: 5px solid #6200ee; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        button { background: #6200ee; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #3700b3; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        #results { display: none; margin-top: 30px; }
     </style>
 </head>
 <body>
@@ -20,45 +22,189 @@
         <option value="en">English</option>
     </select>
 
-    <h1 id="mainTitle"></h1>
+    <h1 id="mainTitle">Cargando...</h1>
     
-    <div id="education">
+    <div class="card">
         <h2 id="eduTitle"></h2>
         <p id="eduText"></p>
     </div>
 
-    <div id="glossary">
+    <div class="card">
         <h2 id="glossaryTitle"></h2>
         <div id="glossaryGrid"></div>
     </div>
 
-    <hr>
-
-    <label id="dateLabel" for="birthDate"></label>
-    <input type="date" id="birthDate">
-    <button id="genBtn" onclick="generate()"></button>
+    <div class="card">
+        <p><strong id="dateLabel"></strong></p>
+        <input type="date" id="birthDate">
+        <button id="genBtn" onclick="generate()"></button>
+    </div>
 
     <div id="results">
         <div id="capture">
-            <div id="pilarLabels">
-                <span id="lb1"></span> <span id="n1"></span> |
-                <span id="lb2"></span> <span id="n2"></span> |
-                <span id="lb3"></span> <span id="n3"></span> |
-                <span id="lb4"></span> <span id="n4"></span> |
-                <span id="lb5"></span> <span id="n5"></span>
+            <h2 style="color:#6200ee">Tu Mapa:</h2>
+            <div id="pilarLabels" style="display: flex; justify-content: space-around; font-weight: bold; margin-bottom: 20px;">
+                <div><span id="lb1"></span>: <span id="n1"></span></div>
+                <div><span id="lb2"></span>: <span id="n2"></span></div>
+                <div><span id="lb3"></span>: <span id="n3"></span></div>
+                <div><span id="lb4"></span>: <span id="n4"></span></div>
+                <div><span id="lb5"></span>: <span id="n5"></span></div>
             </div>
             <div id="details"></div>
         </div>
+        <br>
         <button id="pdfBtn" onclick="download()"></button>
     </div>
 
-    <script>
-        // Pega aquí todo el código <script> que me enviaste arriba
-        const I18N = { ... }; // (Tu código completo)
-        
-        // Al final, asegúrate de que llame a updateLanguage()
-        updateLanguage();
-    </script>
+<script>
+const I18N = {
+    es: {
+        main: "Mapa de Vida Tántrico",
+        eduT: "¿Qué es la Numerología Tántrica?",
+        eduD: "Un sistema de autoconocimiento que utiliza tu fecha de nacimiento para identificar tus desafíos y dones naturales.",
+        gloT: "Los 5 Pilares de tu Ser",
+        pils: [
+            { k: "Alma", v: "Tu mundo interior." },
+            { k: "Karma", v: "Desafíos externos." },
+            { k: "Regalo", v: "Tu don natural." },
+            { k: "Destino", v: "Maestría pasada." },
+            { k: "Misión", v: "Tu propósito final." }
+        ],
+        labs: ["Alma", "Karma", "Regalo", "Destino", "Misión"],
+        btn: "✨ GENERAR MAPA DE LUZ",
+        date: "Ingresa tu Fecha de Nacimiento:",
+        pdf: "📥 Descargar Reporte",
+        tags: ["Esencia", "Sombra", "Misión", "Activación"],
+        archs: {
+            1: ["Pionero", "Iniciativa y voluntad.", "Ego y aislamiento.", "Liderar con humildad.", "Iniciar proyectos."],
+            3: ["Artista", "Alegría y creatividad.", "Dispersión.", "Comunicar con amor.", "Expresar emociones."],
+            4: ["Arquitecto", "Mente neutral y orden.", "Rigidez.", "Construir bases.", "Organizar vida."],
+            5: ["Explorador", "Adaptabilidad y libertad.", "Irresponsabilidad.", "Aprender experiencia.", "Probar algo nuevo."],
+            6: ["Nutridor Responsable", "Amor y compasión.", "Control.", "Armonizar entorno.", "Cuidar la vida."],
+            8: ["Alquimista Poderoso", "Gestión de abundancia.", "Codicia.", "Sanar con recursos.", "Uso de cristales."],
+            9: ["Sabio", "Integridad y calma.", "Desapego.", "Servir a los demás.", "Acto de bondad."],
+            10: ["Viajero / Guerrero", "Evolución y cambio.", "Duda y parálisis.", "Fluir con valor.", "Tomar decisiones."],
+            11: ["Líder Espiritual", "Conexión divina.", "Confusión.", "Inspirar con el ejemplo.", "Meditar 11 min."],
+            22: ["Maestro Constructor", "Visión global.", "Agobio por potencial.", "Construir para todos.", "Planificar futuro."]
+        }
+    },
+    en: {
+        main: "Tantric Life Map",
+        eduT: "What is Tantric Numerology?",
+        eduD: "A self-knowledge system using your birth date to identify challenges and natural gifts.",
+        gloT: "The 5 Pillars of Your Being",
+        pils: [
+            { k: "Soul", v: "Inner self." },
+            { k: "Karma", v: "Outer challenges." },
+            { k: "Gift", v: "Natural gift." },
+            { k: "Destiny", v: "Past mastery." },
+            { k: "Mission", v: "Final purpose." }
+        ],
+        labs: ["Soul", "Karma", "Gift", "Destiny", "Mission"],
+        btn: "✨ GENERATE LIGHT MAP",
+        date: "Enter Birth Date:",
+        pdf: "📥 Download Report",
+        tags: ["Essence", "Shadow", "Mission", "Activation"],
+        archs: {
+            1: ["Pioneer", "Initiative and will.", "Ego and isolation.", "Leading with humility.", "Start projects."],
+            3: ["Artist", "Joy and creativity.", "Scattering.", "Communicate with love.", "Express emotions."],
+            4: ["Architect", "Neutral mind and order.", "Rigidity.", "Build foundations.", "Organize life."],
+            5: ["Explorer", "Adaptability and freedom.", "Irresponsibility.", "Learn through experience.", "Try something new."],
+            6: ["Responsible Nurturer", "Love and compassion.", "Control.", "Harmonize the environment.", "Nurture life."],
+            8: ["Powerful Alchemist", "Managing abundance.", "Greed.", "Heal with resources.", "Use crystals."],
+            9: ["Wise One", "Integrity and calm.", "Detachment.", "Serve others.", "Acts of kindness."],
+            10: ["Traveler / Warrior", "Evolution and change.", "Doubt and paralysis.", "Flow with courage.", "Make decisions."],
+            11: ["Spiritual Leader", "Divine connection.", "Confusion.", "Inspire by example.", "Meditate 11 min."],
+            22: ["Master Builder", "Global vision.", "Overwhelm.", "Build for everyone.", "Plan the future."]
+        }
+    }
+};
+
+function reduceNumber(n) {
+    if (n === 11 || n === 22) return n;
+    while (n > 9) {
+        n = String(n).split("").reduce((sum, digit) => sum + Number(digit), 0);
+        if (n === 11 || n === 22) return n;
+    }
+    return n;
+}
+
+function updateLanguage() {
+    const langKey = document.getElementById('langSelect').value;
+    const l = I18N[langKey];
+    document.getElementById('mainTitle').innerText = l.main;
+    document.getElementById('eduTitle').innerText = l.eduT;
+    document.getElementById('eduText').innerText = l.eduD;
+    document.getElementById('glossaryTitle').innerText = l.gloT;
+    document.getElementById('dateLabel').innerText = l.date;
+    document.getElementById('genBtn').innerText = l.btn;
+    document.getElementById('pdfBtn').innerText = l.pdf;
+
+    document.getElementById('glossaryGrid').innerHTML = l.pils
+        .map(item => `<div><b>${item.k}:</b> ${item.v}</div>`)
+        .join("");
+
+    l.labs.forEach((txt, i) => {
+        const el = document.getElementById('lb' + (i + 1));
+        if(el) el.innerText = txt;
+    });
+}
+
+function generate() {
+    const val = document.getElementById('birthDate').value;
+    if (!val) {
+        alert('Selecciona una fecha de nacimiento.');
+        return;
+    }
+
+    const langKey = document.getElementById('langSelect').value;
+    const l = I18N[langKey];
+    const [y, m, d] = val.split('-').map(Number);
+
+    const day = reduceNumber(d);
+    const month = reduceNumber(m);
+    const yearFull = reduceNumber(y);
+    const yearShort = reduceNumber(Number(String(y).slice(-2)));
+    const mission = reduceNumber(day + month + yearFull);
+
+    const res = [day, month, yearShort, yearFull, mission];
+
+    res.forEach((v, i) => {
+        const node = document.getElementById('n' + (i + 1));
+        if(node) node.innerText = v;
+    });
+
+    let html = "";
+    res.forEach((num, i) => {
+        const a = l.archs[num] || ["Explorador", "Energía.", "Duda.", "Seguir.", "Moverse."];
+        html += `<div class="result-card">
+            <h3 style="margin:0 0 10px 0; color:#6200ee;">${l.labs[i]}: ${a[0]} (${num})</h3>
+            <div class="detail-row">✨ <b>${l.tags[0]}:</b> ${a[1]}</div>
+            <div class="detail-row">🌑 <b>${l.tags[1]}:</b> ${a[2]}</div>
+            <div class="detail-row">🎯 <b>${l.tags[2]}:</b> ${a[3]}</div>
+            <div class="detail-row">⚡ <b>${l.tags[3]}:</b> ${a[4]}</div>
+        </div>`;
+    });
+
+    document.getElementById('details').innerHTML = html;
+    document.getElementById('results').style.display = 'block';
+}
+
+function download() {
+    html2pdf()
+        .from(document.getElementById('capture'))
+        .set({
+            margin: 10,
+            filename: 'Mapa_Vida_Tantrico.pdf',
+            html2canvas: { scale: 2 }
+        })
+        .save();
+}
+
+// Inicializar la página
+updateLanguage();
+</script>
 </body>
 </html>
+
 
