@@ -1,30 +1,117 @@
 <script>
+const I18N = {
+    es: {
+        main: "Mapa de Vida Tántrico",
+        eduT: "¿Qué es la Numerología Tántrica?",
+        eduD: "Un sistema de autoconocimiento que utiliza tu fecha de nacimiento para identificar tus desafíos y dones naturales.",
+        gloT: "Los 5 Pilares de tu Ser",
+        pils: [
+            { k: "Alma", v: "Tu mundo interior." },
+            { k: "Karma", v: "Desafíos externos." },
+            { k: "Regalo", v: "Tu don natural." },
+            { k: "Destino", v: "Maestría pasada." },
+            { k: "Misión", v: "Tu propósito final." }
+        ],
+        labs: ["Alma", "Karma", "Regalo", "Destino", "Misión"],
+        btn: "✨ GENERAR MAPA DE LUZ",
+        date: "Ingresa tu Fecha de Nacimiento:",
+        pdf: "📥 Descargar Reporte",
+        tags: ["Esencia", "Sombra", "Misión", "Activación"],
+        archs: {
+            1: ["Pionero", "Iniciativa y voluntad.", "Ego y aislamiento.", "Liderar con humildad.", "Iniciar proyectos."],
+            3: ["Artista", "Alegría y creatividad.", "Dispersión.", "Comunicar con amor.", "Expresar emociones."],
+            4: ["Arquitecto", "Mente neutral y orden.", "Rigidez.", "Construir bases.", "Organizar vida."],
+            5: ["Explorador", "Adaptabilidad y libertad.", "Irresponsabilidad.", "Aprender experiencia.", "Probar algo nuevo."],
+            6: ["Nutridor Responsable", "Amor y compasión.", "Control.", "Armonizar entorno.", "Cuidar la vida."],
+            8: ["Alquimista Poderoso", "Gestión de abundancia.", "Codicia.", "Sanar con recursos.", "Uso de cristales."],
+            9: ["Sabio", "Integridad y calma.", "Desapego.", "Servir a los demás.", "Acto de bondad."],
+            10: ["Viajero / Guerrero", "Evolución y cambio.", "Duda y parálisis.", "Fluir con valor.", "Tomar decisiones."],
+            11: ["Líder Espiritual", "Conexión divina.", "Confusión.", "Inspirar con el ejemplo.", "Meditar 11 min."],
+            22: ["Maestro Constructor", "Visión global.", "Agobio por potencial.", "Construir para todos.", "Planificar futuro."]
+        }
+    },
+    en: {
+        main: "Tantric Life Map",
+        eduT: "What is Tantric Numerology?",
+        eduD: "A self-knowledge system using your birth date to identify challenges and natural gifts.",
+        gloT: "The 5 Pillars of Your Being",
+        pils: [
+            { k: "Soul", v: "Inner self." },
+            { k: "Karma", v: "Outer challenges." },
+            { k: "Gift", v: "Natural gift." },
+            { k: "Destiny", v: "Past mastery." },
+            { k: "Mission", v: "Final purpose." }
+        ],
+        labs: ["Soul", "Karma", "Gift", "Destiny", "Mission"],
+        btn: "✨ GENERATE LIGHT MAP",
+        date: "Enter Birth Date:",
+        pdf: "📥 Download Report",
+        tags: ["Essence", "Shadow", "Mission", "Activation"],
+        archs: {
+            1: ["Pioneer", "Initiative and will.", "Ego and isolation.", "Leading with humility.", "Start projects."],
+            3: ["Artist", "Joy and creativity.", "Scattering.", "Communicate with love.", "Express emotions."],
+            4: ["Architect", "Neutral mind and order.", "Rigidity.", "Build foundations.", "Organize life."],
+            5: ["Explorer", "Adaptability and freedom.", "Irresponsibility.", "Learn through experience.", "Try something new."],
+            6: ["Responsible Nurturer", "Love and compassion.", "Control.", "Harmonize the environment.", "Nurture life."],
+            8: ["Powerful Alchemist", "Managing abundance.", "Greed.", "Heal with resources.", "Use crystals."],
+            9: ["Wise One", "Integrity and calm.", "Detachment.", "Serve others.", "Acts of kindness."],
+            10: ["Traveler / Warrior", "Evolution and change.", "Doubt and paralysis.", "Flow with courage.", "Make decisions."],
+            11: ["Spiritual Leader", "Divine connection.", "Confusion.", "Inspire by example.", "Meditate 11 min."],
+            22: ["Master Builder", "Global vision.", "Overwhelm.", "Build for everyone.", "Plan the future."]
+        }
+    }
+};
+
 function reduceNumber(n) {
     if (n === 11 || n === 22) return n;
     while (n > 9) {
-        n = String(n).split("").reduce((sum, d) => sum + Number(d), 0);
+        n = String(n).split("").reduce((sum, digit) => sum + Number(digit), 0);
         if (n === 11 || n === 22) return n;
     }
     return n;
 }
 
+function updateLanguage() {
+    const l = I18N[document.getElementById('langSelect').value];
+    document.getElementById('mainTitle').innerText = l.main;
+    document.getElementById('eduTitle').innerText = l.eduT;
+    document.getElementById('eduText').innerText = l.eduD;
+    document.getElementById('glossaryTitle').innerText = l.gloT;
+    document.getElementById('dateLabel').innerText = l.date;
+    document.getElementById('genBtn').innerText = l.btn;
+    document.getElementById('pdfBtn').innerText = l.pdf;
+
+    document.getElementById('glossaryGrid').innerHTML = l.pils
+        .map(item => `<div><b>${item.k}:</b> ${item.v}</div>`)
+        .join("");
+
+    l.labs.forEach((txt, i) => {
+        document.getElementById('lb' + (i + 1)).innerText = txt;
+    });
+}
+
 function generate() {
     const val = document.getElementById('birthDate').value;
-    if (!val) return;
+    if (!val) {
+        alert('Selecciona una fecha de nacimiento.');
+        return;
+    }
 
     const l = I18N[document.getElementById('langSelect').value];
     const [y, m, d] = val.split('-').map(Number);
 
-    const soul = reduceNumber(d);
-    const karma = reduceNumber(m);
-    const gift = reduceNumber(Number(String(y).slice(-2)));
-    const destiny = reduceNumber(String(y).split('').reduce((a, b) => a + Number(b), 0));
-    const path = reduceNumber(soul + karma + destiny);
+    const day = reduceNumber(d);
+    const month = reduceNumber(m);
+    const yearFull = reduceNumber(y);
+    const yearShort = reduceNumber(Number(String(y).slice(-2)));
+    const mission = reduceNumber(day + month + yearFull);
 
-    const res = [soul, karma, gift, destiny, path];
+    const res = [day, month, yearShort, yearFull, mission];
 
     res.forEach((v, i) => {
-        document.getElementById('n' + (i + 1)).innerText = v;
+        const node = document.getElementById('n' + (i + 1));
+        node.innerText = v;
+        node.setAttribute('aria-label', `${l.labs[i]}: ${v}`);
     });
 
     let html = "";
@@ -42,4 +129,17 @@ function generate() {
     document.getElementById('details').innerHTML = html;
     document.getElementById('results').style.display = 'block';
 }
-</script>
+
+function download() {
+    html2pdf()
+        .from(document.getElementById('capture'))
+        .set({
+            margin: 10,
+            filename: 'Mapa_Vida_Tantrico.pdf',
+            html2canvas: { scale: 2 }
+        })
+        .save();
+}
+
+updateLanguage();
+             </script>
